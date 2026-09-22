@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBER // 2077</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 75% 25%, rgba(255, 0, 180, .22), transparent 28%),
+        radial-gradient(circle at 20% 70%, rgba(0, 240, 255, .18), transparent 30%),
+        linear-gradient(135deg, #070713 0%, #120820 45%, #030b18 100%);
+    }
+
+    /* Cyberpunk grid */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0, 238, 255, .08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 238, 255, .08) 1px, transparent 1px);
+      background-size: 55px 55px;
+      transform: perspective(500px) rotateX(58deg) scale(1.8) translateY(25%);
+      transform-origin: center bottom;
+      opacity: .45;
+    }
+
+    header {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 7%;
+      border-bottom: 1px solid rgba(0, 238, 255, .25);
+      backdrop-filter: blur(8px);
+      background: rgba(5, 5, 15, .45);
+    }
+
+    .logo {
+      font-weight: 900;
+      letter-spacing: 5px;
+      color: #00f6ff;
+      text-shadow: 0 0 12px #00f6ff;
+    }
+
+    nav { display: flex; gap: 28px; }
+    nav a {
+      color: #d7faff;
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: 2px;
+      transition: .25s;
+    }
+    nav a:hover { color: #ff28c8; text-shadow: 0 0 10px #ff28c8; }
+
+    main {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 75px);
+      display: grid;
+      place-items: center;
+      padding: 70px 7%;
+    }
+
+    .hero {
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 8px 18px;
+      border: 1px solid #ff28c8;
+      color: #ff7bdf;
+      letter-spacing: 4px;
+      font-size: 12px;
+      box-shadow: 0 0 18px rgba(255, 40, 200, .25);
+    }
+
+    h1 {
+      font-size: clamp(54px, 11vw, 130px);
+      line-height: .85;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow:
+        3px 3px 0 #ff28c8,
+        -3px -3px 0 #00f6ff,
+        0 0 30px rgba(0, 246, 255, .45);
+      margin-bottom: 30px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: 0 auto 36px;
+      color: #b8c8d8;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 30px;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 2px;
+      border: 1px solid #00f6ff;
+      color: #00f6ff;
+      background: rgba(0, 246, 255, .06);
+      transition: .25s;
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    }
+
+    .btn.primary {
+      background: #00dce8;
+      color: #05050d;
+      box-shadow: 0 0 24px rgba(0, 246, 255, .4);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(255, 40, 200, .55);
+      border-color: #ff28c8;
+      color: #fff;
+    }
+
+    .status {
+      margin-top: 55px;
+      display: flex;
+      justify-content: center;
+      gap: 35px;
+      flex-wrap: wrap;
+      color: #718797;
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    .status span::before {
+      content: "●";
+      color: #00ff9d;
+      margin-right: 8px;
+      text-shadow: 0 0 8px #00ff9d;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 20px; }
+      nav { gap: 12px; }
+      nav a { font-size: 10px; }
+      main { padding: 50px 20px; }
+      h1 { letter-spacing: 3px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">NΞON//CITY</div>
+    <nav>
+      <a href="#">HOME</a>
+      <a href="#">SYSTEM</a>
+      <a href="#">CONTACT</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="tag">SYSTEM ONLINE // 2077</div>
+      <h1>CYBER<br>FUTURE</h1>
+      <p>
+        Welcome to the neon side of the city.
+        A simple cyberpunk landing page built with pure HTML and CSS.
+      </p>
+
+      <div class="buttons">
+        <a class="btn primary" href="#">ENTER SYSTEM</a>
+        <a class="btn" href="#">EXPLORE</a>
+      </div>
+
+      <div class="status">
+        <span>NETWORK ONLINE</span>
+        <span>SECURE CONNECTION</span>
+        <span>NEON DISTRICT</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
