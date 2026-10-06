@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLY SHOP｜Firebase 電商</title>
+<meta name="description" content="純 HTML + Firebase 電子商務網站">
+
+<style>
+:root{
+  --bg:#f5f5f2;--card:#fff;--text:#171717;--muted:#777;--line:#e5e5e0;
+  --accent:#111;--danger:#c62828;--ok:#237a4b;--radius:16px;
+  --shadow:0 18px 50px rgba(0,0,0,.10);--max:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0}
+img{display:block;width:100%;object-fit:cover}
+a{color:inherit}
+.container{max-width:var(--max);margin:auto;padding:0 20px}
+.header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{height:70px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.logo{font-weight:900;letter-spacing:.12em;font-size:21px}
+.nav-links{display:flex;gap:8px}
+.nav-links button,.nav-action{background:transparent;padding:9px 12px;border-radius:9px}
+.nav-links button:hover,.nav-action:hover{background:#eee}
+.nav-actions{display:flex;align-items:center;gap:6px}
+.badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:#111;color:#fff;font-size:11px}
+.hero{margin:30px auto;max-width:var(--max);min-height:360px;border-radius:24px;padding:55px;display:flex;align-items:center;background:linear-gradient(120deg,#e9e7df,#dcdad2)}
+.hero small{letter-spacing:.18em;color:#666}
+.hero h1{font-size:clamp(42px,6vw,72px);line-height:1.05;margin:12px 0 20px}
+.hero p{max-width:580px;color:#666;margin-bottom:25px}
+.btn{background:#111;color:#fff;border-radius:999px;padding:12px 20px;transition:.2s}
+.btn:hover{transform:translateY(-2px)}
+.btn.light{background:#eee;color:#111}
+.btn.danger{background:var(--danger)}
+.section{padding:30px 0 80px}
+.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:20px}
+.section-head h2{font-size:30px}
+.search{width:min(420px,100%);padding:13px 16px;border:1px solid var(--line);border-radius:999px;outline:none;background:#fff}
+.filters{display:flex;gap:8px;overflow:auto;margin-bottom:25px}
+.filter{white-space:nowrap;padding:9px 16px;background:#fff;border:1px solid var(--line);border-radius:999px}
+.filter.active,.filter:hover{background:#111;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.card{cursor:pointer}
+.card-image{position:relative;aspect-ratio:1/1;border-radius:var(--radius);overflow:hidden;background:#eee}
+.card-image img{height:100%;transition:.4s}
+.card:hover img{transform:scale(1.045)}
+.quick{position:absolute;right:12px;bottom:12px;width:42px;height:42px;border-radius:50%;background:#fff;font-size:22px;box-shadow:0 5px 20px rgba(0,0,0,.12)}
+.card-info{padding:13px 2px}
+.card-cat{font-size:12px;color:#999}
+.card h3{font-size:16px;margin:3px 0}
+.card p{font-size:13px;color:#777;min-height:42px}
+.price{font-weight:800;margin-top:8px}
+.empty{text-align:center;padding:70px;color:#888;grid-column:1/-1}
+footer{padding:45px 20px;text-align:center;background:#111;color:#aaa;font-size:13px}
+
+/* Modal / Drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{position:relative;width:min(900px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;box-shadow:var(--shadow)}
+.close{position:absolute;right:18px;top:18px;width:38px;height:38px;border-radius:50%;background:#eee;z-index:2}
+.product-modal{display:grid;grid-template-columns:1fr 1fr}
+.product-modal img{height:100%;min-height:500px}
+.product-copy{padding:50px;display:flex;flex-direction:column;justify-content:center}
+.product-copy h2{font-size:34px;line-height:1.2;margin:10px 0 18px}
+.product-copy p{color:#777;margin-bottom:22px}
+.drawer-wrap{align-items:stretch;justify-content:flex-end;padding:0}
+.drawer{height:100%;width:min(470px,100%);background:#fff;display:flex;flex-direction:column}
+.drawer-head{padding:22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.drawer-body{flex:1;overflow:auto;padding:20px}
+.cart-row{display:grid;grid-template-columns:70px 1fr auto;gap:12px;margin-bottom:20px}
+.cart-row img{width:70px;height:70px;border-radius:10px}
+.qty{display:flex;gap:8px;align-items:center;margin-top:7px}
+.qty button{width:25px;height:25px;border-radius:50%;background:#eee}
+.drawer-foot{padding:20px;border-top:1px solid var(--line)}
+.total{display:flex;justify-content:space-between;font-size:18px;font-weight:800;margin-bottom:15px}
+
+/* Forms */
+.form{padding:28px}
+.form h2{margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;color:#666;margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:10px;outline:none;background:#fff}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#777}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.msg{font-size:13px;margin:10px 0;color:var(--danger)}
+.ok{color:var(--ok)}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tab{padding:12px 15px;background:none}
+.tab.active{border-bottom:2px solid #111;font-weight:700}
+.panel{display:none}
+.panel.active{display:block}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);white-space:nowrap}
+.admin-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:15px}
+.admin-list{max-height:430px;overflow:auto}
+.order{border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:12px}
+.order-head{display:flex;justify-content:space-between;gap:10px}
+.status{font-size:12px;padding:4px 8px;border-radius:99px;background:#eee}
+.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);background:#111;color:#fff;padding:11px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:300}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.note{background:#f6f6f3;padding:12px;border-radius:10px;color:#666;font-size:13px;margin-bottom:15px}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .nav-links{display:none}
+  .hero{margin:20px;padding:45px 28px}
+  .product-modal{grid-template-columns:1fr}
+  .product-modal img{min-height:300px;max-height:420px}
+  .product-copy{padding:30px}
+}
+@media(max-width:600px){
+  .grid{gap:14px}
+  .card p{display:none}
+  .section-head{display:block}
+  .search{margin-top:14px;width:100%}
+  .form-grid{grid-template-columns:1fr}
+  .hero h1{font-size:44px}
+}
+</style>
+</head>
+
+<body>
+<header class="header">
+  <nav class="nav container">
+    <div class="logo">FLY SHOP</div>
+    <div class="nav-links">
+      <button data-filter="全部">全部商品</button>
+      <button data-filter="桌面生活">桌面生活</button>
+      <button data-filter="生活器物">生活器物</button>
+      <button data-filter="文具">文具</button>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-action" id="accountBtn">會員登入</button>
+      <button class="nav-action" id="cartBtn">購物車 <span class="badge" id="cartCount">0</span></button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero container">
+  <div>
+    <small>SIMPLE LIVING · FLY SHOP</small>
+    <h1>讓生活<br>留一點空間。</h1>
+    <p>以 Firebase 為資料核心的純 HTML 電商網站。商品、會員、購物車與訂單皆可直接串接你的 Firebase Project。</p>
+    <button class="btn" onclick="document.querySelector('#products').scrollIntoView({behavior:'smooth'})">探索商品</button>
+  </div>
+</section>
+
+<main class="container section" id="products">
+  <div class="section-head">
+    <div><small>COLLECTION</small><h2>精選商品</h2></div>
+    <input class="search" id="search" type="search" placeholder="搜尋商品名稱或分類">
+  </div>
+  <div class="filters">
+    <button class="filter active" data-filter="全部">全部</button>
+    <button class="filter" data-filter="桌面生活">桌面生活</button>
+    <button class="filter" data-filter="生活器物">生活器物</button>
+    <button class="filter" data-filter="文具">文具</button>
+  </div>
+  <div class="grid" id="productGrid"><div class="empty">商品載入中...</div></div>
+</main>
+
+<footer>© 2026 FLY SHOP · Firebase E-Commerce Demo</footer>
+
+<!-- Product -->
+<div class="overlay" id="productOverlay">
+  <div class="modal product-modal">
+    <button class="close" data-close="productOverlay">×</button>
+    <img id="detailImage" alt="">
+    <div class="product-copy">
+      <small id="detailCategory"></small>
+      <h2 id="detailName"></h2>
+      <p id="detailDescription"></p>
+      <div class="price" id="detailPrice"></div>
+      <p id="detailStock"></p>
+      <button class="btn" id="detailAdd">加入購物車</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cart -->
+<div class="overlay drawer-wrap" id="cartOverlay">
+  <aside class="drawer">
+    <div class="drawer-head"><h2>購物車</h2><button class="close" data-close="cartOverlay">×</button></div>
+    <div class="drawer-body" id="cartItems"></div>
+    <div class="drawer-foot">
+      <div class="total"><span>合計</span><span id="cartTotal">NT$ 0</span></div>
+      <button class="btn" style="width:100%" id="checkoutBtn">前往結帳</button>
+    </div>
+  </aside>
+</div>
+
+<!-- Account -->
+<div class="overlay" id="accountOverlay">
+  <div class="modal" style="width:min(650px,100%)">
+    <button class="close" data-close="accountOverlay">×</button>
+    <div class="form">
+      <div id="authArea">
+        <div class="tabs">
+          <button class="tab active" data-auth-tab="login">會員登入</button>
+          <button class="tab" data-auth-tab="register">註冊會員</button>
+        </div>
+        <div class="panel active" id="loginPanel">
+          <h2>會員登入</h2>
+          <div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="email"></div>
+          <div class="field"><label>密碼</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
+          <button class="btn" id="loginBtn">登入</button>
+          <div class="msg" id="loginMsg"></div>
+        </div>
+        <div class="panel" id="registerPanel">
+          <h2>建立會員</h2>
+          <div class="field"><label>姓名</label><input id="regName"></div>
+          <div class="field"><label>Email</label><input id="regEmail" type="email" autocomplete="email"></div>
+          <div class="field"><label>密碼（至少 6 碼）</label><input id="regPassword" type="password" autocomplete="new-password"></div>
+          <button class="btn" id="registerBtn">註冊</button>
+          <div class="msg" id="registerMsg"></div>
+        </div>
+      </div>
+
+      <div id="profileArea" style="display:none">
+        <h2>會員中心</h2>
+        <div class="note" id="loginIdentity"></div>
+        <div class="field"><label>姓名</label><input id="profileName"></div>
+        <div class="field"><label>電話</label><input id="profilePhone"></div>
+        <div class="field"><label>地址</label><textarea id="profileAddress" rows="3"></textarea></div>
+        <div class="actions">
+          <button class="btn" id="saveProfileBtn">儲存會員資料</button>
+          <button class="btn light" id="ordersBtn">我的訂單</button>
+          <button class="btn danger" id="logoutBtn">登出</button>
+        </div>
+        <div class="msg" id="profileMsg"></div>
+        <div id="ordersArea" style="margin-top:25px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout -->
+<div class="overlay" id="checkoutOverlay">
+  <div class="modal" style="width:min(760px,100%)">
+    <button class="close" data-close="checkoutOverlay">×</button>
+    <div class="form">
+      <h2>結帳</h2>
+      <div id="checkoutLoginNote" class="note"></div>
+      <div class="form-grid">
+        <div class="field"><label>收件人</label><input id="shipName"></div>
+        <div class="field"><label>電話</label><input id="shipPhone"></div>
+      </div>
+      <div class="field"><label>收件地址</label><textarea id="shipAddress" rows="3"></textarea></div>
+      <div class="field">
+        <label>付款方式</label>
+        <select id="paymentMethod">
+          <option value="cod">貨到付款</option>
+          <option value="bank">銀行轉帳</option>
+          <option value="card-demo">信用卡（Demo／尚未實際扣款）</option>
+        </select>
+      </div>
+      <div class="note">純 HTML + Firebase 可以安全建立訂單，但真正信用卡扣款必須再串接 Stripe、綠界、藍新等金流，並由後端／Cloud Functions 驗證付款結果。</div>
+      <div class="total"><span>訂單金額</span><span id="checkoutTotal">NT$ 0</span></div>
+      <button class="btn" style="width:100%" id="placeOrderBtn">建立訂單</button>
+      <div class="msg" id="checkoutMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin -->
+<div class="overlay" id="adminOverlay">
+  <div class="modal" style="width:min(1000px,100%)">
+    <button class="close" data-close="adminOverlay">×</button>
+    <div class="form">
+      <h2>商品管理</h2>
+      <div class="note">只有 Firestore users/{你的 UID} 文件中 role = "admin" 的帳號可以使用此區。</div>
+      <div class="admin-toolbar">
+        <strong>商品列表</strong>
+        <button class="btn" id="newProductBtn">新增商品</button>
+      </div>
+      <div class="table-wrap admin-list"><table><thead><tr><th>商品</th><th>分類</th><th>價格</th><th>庫存</th><th>操作</th></tr></thead><tbody id="adminProductList"></tbody></table></div>
+      <hr style="margin:25px 0;border:0;border-top:1px solid var(--line)">
+      <div id="productEditor" style="display:none">
+        <h3 id="editorTitle">新增商品</h3>
+        <input type="hidden" id="productId">
+        <div class="form-grid">
+          <div class="field"><label>商品名稱</label><input id="pName"></div>
+          <div class="field"><label>分類</label><input id="pCategory" placeholder="例如：桌面生活"></div>
+          <div class="field"><label>價格</label><input id="pPrice" type="number" min="0"></div>
+          <div class="field"><label>庫存</label><input id="pStock" type="number" min="0"></div>
+        </div>
+        <div class="field"><label>圖片 URL</label><input id="pImage" placeholder="https://..."></div>
+        <div class="field"><label>商品描述</label><textarea id="pDescription" rows="4"></textarea></div>
+        <div class="actions">
+          <button class="btn" id="saveProductBtn">儲存商品</button>
+          <button class="btn light" id="cancelProductBtn">取消</button>
+        </div>
+        <div class="msg" id="productMsg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, signOut
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc,
+  updateDoc, deleteDoc, query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA6CS8xj4vAogH1pIuO8dgcBdOz2xFTpCs",
+  authDomain: "flyproject-8234c.firebaseapp.com",
+  projectId: "flyproject-8234c",
+  storageBucket: "flyproject-8234c.firebasestorage.app",
+  messagingSenderId: "822657654816",
+  appId: "1:822657654816:web:bab3b323445938e6761c45",
+  measurementId: "G-8164N6H9T2"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let products = [];
+let cart = JSON.parse(localStorage.getItem("flyShopCart") || "[]");
+let currentUser = null;
+let currentProfile = null;
+let isAdmin = false;
+let currentFilter = "全部";
+
+const demoProducts = [
+  {id:"demo-1",name:"聚合桌面收納",category:"桌面生活",price:890,stock:20,image:"https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=900&q=80",description:"將桌面收納與幾何美感結合，讓工作空間保持清爽。"},
+  {id:"demo-2",name:"北歐陶瓷杯",category:"生活器物",price:490,stock:30,image:"https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?auto=format&fit=crop&w=900&q=80",description:"簡約比例搭配柔和質感，適合日常使用。"},
+  {id:"demo-3",name:"木質桌面托盤",category:"桌面生活",price:690,stock:15,image:"https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=900&q=80",description:"以自然木質調性整理桌面小物。"},
+  {id:"demo-4",name:"極簡筆記本",category:"文具",price:280,stock:50,image:"https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=900&q=80",description:"適合工作、創作與日常紀錄。"}
+];
+
+const $ = id => document.getElementById(id);
+const money = n => `NT$ ${Number(n || 0).toLocaleString("zh-TW")}`;
+function toast(msg){ $("toast").textContent=msg; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),2200); }
+function open(id){ $(id).classList.add("open"); }
+function close(id){ $(id).classList.remove("open"); }
+
+async function loadProducts(){
+  try{
+    const q = query(collection(db,"products"),orderBy("createdAt","desc"));
+    const snap = await getDocs(q);
+    products = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(!products.length) products = demoProducts;
+  }catch(e){
+    console.error(e);
+    products = demoProducts;
+    toast("Firestore 尚無商品，暫顯示展示商品");
+  }
+  renderProducts();
+}
+
+function renderProducts(){
+  const keyword = $("search").value.trim().toLowerCase();
+  const list = products.filter(p=>{
+    const matchFilter = currentFilter==="全部" || p.category===currentFilter;
+    const text = `${p.name||""} ${p.category||""} ${p.description||""}`.toLowerCase();
+    return matchFilter && text.includes(keyword);
+  });
+  $("productGrid").innerHTML = "";
+  if(!list.length){ $("productGrid").innerHTML='<div class="empty">找不到符合條件的商品</div>'; return; }
+  list.forEach(p=>{
+    const card=document.createElement("article");
+    card.className="card";
+    card.innerHTML=`
+      <div class="card-image">
+        <img src="${p.image||""}" alt="${escapeHtml(p.name||"商品")}" loading="lazy">
+        <button class="quick" aria-label="加入購物車">＋</button>
+      </div>
+      <div class="card-info">
+        <span class="card-cat">${escapeHtml(p.category||"生活選物")}</span>
+        <h3>${escapeHtml(p.name||"未命名商品")}</h3>
+        <p>${escapeHtml(p.description||"")}</p>
+        <div class="price">${money(p.price)}</div>
+      </div>`;
+    card.onclick=e=>{if(e.target.closest(".quick"))return; showProduct(p.id)};
+    card.querySelector(".quick").onclick=e=>{e.stopPropagation(); addCart(p.id)};
+    $("productGrid").appendChild(card);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+function showProduct(id){
+  const p=products.find(x=>x.id===id); if(!p)return;
+  $("detailImage").src=p.image||"";
+  $("detailName").textContent=p.name||"";
+  $("detailCategory").textContent=p.category||"";
+  $("detailDescription").textContent=p.description||"";
+  $("detailPrice").textContent=money(p.price);
+  $("detailStock").textContent=`庫存：${p.stock ?? "未設定"}`;
+  $("detailAdd").onclick=()=>{addCart(id);close("productOverlay")};
+  open("productOverlay");
+}
+
+function saveCart(){localStorage.setItem("flyShopCart",JSON.stringify(cart));renderCart();}
+function addCart(id){
+  const p=products.find(x=>x.id===id); if(!p)return;
+  if(Number(p.stock)===0){toast("此商品目前缺貨");return;}
+  const item=cart.find(x=>x.id===id);
+  if(item)item.quantity++;
+  else cart.push({id:p.id,name:p.name,price:Number(p.price),image:p.image,quantity:1});
+  saveCart(); toast(`${p.name} 已加入購物車`);
+}
+function changeQty(id,delta){
+  const i=cart.find(x=>x.id===id); if(!i)return;
+  i.quantity+=delta;
+  if(i.quantity<=0)cart=cart.filter(x=>x.id!==id);
+  saveCart();
+}
+function renderCart(){
+  $("cartCount").textContent=cart.reduce((s,x)=>s+x.quantity,0);
+  const box=$("cartItems"); box.innerHTML="";
+  if(!cart.length){box.innerHTML='<div class="empty">購物車目前是空的</div>'; $("cartTotal").textContent=money(0); return;}
+  cart.forEach(i=>{
+    const row=document.createElement("div"); row.className="cart-row";
+    row.innerHTML=`
+      <img src="${i.image||""}" alt="">
+      <div><strong>${escapeHtml(i.name)}</strong><div>${money(i.price)}</div>
+      <div class="qty"><button data-d="-1">−</button><span>${i.quantity}</span><button data-d="1">＋</button></div></div>
+      <button class="nav-action" data-remove>×</button>`;
+    row.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>changeQty(i.id,Number(b.dataset.d)));
+    row.querySelector("[data-remove]").onclick=()=>{cart=cart.filter(x=>x.id!==i.id);saveCart()};
+    box.appendChild(row);
+  });
+  $("cartTotal").textContent=money(cart.reduce((s,x)=>s+x.price*x.quantity,0));
+}
+
+async function register(){
+  const msg=$("registerMsg"); msg.textContent="";
+  try{
+    const name=$("regName").value.trim(),email=$("regEmail").value.trim(),pw=$("regPassword").value;
+    if(!name)throw Error("請輸入姓名");
+    const cred=await createUserWithEmailAndPassword(auth,email,pw);
+    await setDoc(doc(db,"users",cred.user.uid),{uid:cred.user.uid,name,email,phone:"",address:"",role:"customer",createdAt:serverTimestamp()});
+    toast("註冊成功"); $("regPassword").value="";
+  }catch(e){msg.textContent=friendlyAuthError(e);}
+}
+
+async function login(){
+  const msg=$("loginMsg"); msg.textContent="";
+  try{
+    await signInWithEmailAndPassword(auth,$("loginEmail").value.trim(),$("loginPassword").value);
+    toast("登入成功"); close("accountOverlay");
+  }catch(e){msg.textContent=friendlyAuthError(e);}
+}
+function friendlyAuthError(e){
+  const map={
+    "auth/invalid-credential":"Email 或密碼錯誤",
+    "auth/email-already-in-use":"此 Email 已註冊",
+    "auth/weak-password":"密碼至少需要 6 碼",
+    "auth/invalid-email":"Email 格式不正確"
+  };
+  return map[e.code]||e.message||"操作失敗";
+}
+
+async function loadProfile(){
+  if(!currentUser)return;
+  const snap=await getDoc(doc(db,"users",currentUser.uid));
+  currentProfile=snap.exists()?snap.data():{};
+  isAdmin=currentProfile.role==="admin";
+  $("profileName").value=currentProfile.name||"";
+  $("profilePhone").value=currentProfile.phone||"";
+  $("profileAddress").value=currentProfile.address||"";
+  $("loginIdentity").textContent=`登入帳號：${currentUser.email}${isAdmin?" · 管理員":""}`;
+  $("authArea").style.display="none"; $("profileArea").style.display="block";
+  if(isAdmin) addAdminButton();
+}
+function addAdminButton(){
+  if($("adminBtn"))return;
+  const b=document.createElement("button");b.id="adminBtn";b.className="btn light";b.textContent="商品管理";
+  b.onclick=()=>{renderAdminProducts();open("adminOverlay")};
+  document.querySelector("#profileArea .actions").appendChild(b);
+}
+async function saveProfile(){
+  try{
+    await updateDoc(doc(db,"users",currentUser.uid),{
+      name:$("profileName").value.trim(),
+      phone:$("profilePhone").value.trim(),
+      address:$("profileAddress").value.trim()
+    });
+    toast("會員資料已更新"); await loadProfile();
+  }catch(e){$("profileMsg").textContent=e.message}
+}
+async function logout(){
+  await signOut(auth); close("accountOverlay"); toast("已登出");
+}
+
+async function showOrders(){
+  if(!currentUser)return;
+  const q=query(collection(db,"orders"),where("userId","==",currentUser.uid),orderBy("createdAt","desc"));
+  const snap=await getDocs(q);
+  const mine=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.userId===currentUser.uid);
+  $("ordersArea").innerHTML="<h3 style='margin-bottom:12px'>我的訂單</h3>";
+  if(!mine.length){$("ordersArea").innerHTML+="<p style='color:#888'>目前沒有訂單。</p>";return;}
+  mine.forEach(o=>{
+    const div=document.createElement("div");div.className="order";
+    div.innerHTML=`<div class="order-head"><strong>#${o.id.slice(0,8)}</strong><span class="status">${escapeHtml(o.status||"pending")}</span></div>
+      <p>${money(o.total)} · ${escapeHtml(o.paymentMethod||"")}</p>
+      <small>${(o.items||[]).map(i=>`${escapeHtml(i.name)} × ${i.quantity}`).join("、")}</small>`;
+    $("ordersArea").appendChild(div);
+  });
+}
+
+function startCheckout(){
+  if(!currentUser){toast("請先登入會員");open("accountOverlay");return;}
+  if(!cart.length){toast("購物車是空的");return;}
+  $("shipName").value=currentProfile?.name||"";
+  $("shipPhone").value=currentProfile?.phone||"";
+  $("shipAddress").value=currentProfile?.address||"";
+  $("checkoutTotal").textContent=money(cart.reduce((s,x)=>s+x.price*x.quantity,0));
+  $("checkoutLoginNote").textContent=`訂單將建立於：${currentUser.email}`;
+  open("checkoutOverlay");
+}
+
+async function placeOrder(){
+  const msg=$("checkoutMsg");msg.textContent="";
+  try{
+    if(!currentUser)throw Error("請先登入");
+    if(!cart.length)throw Error("購物車是空的");
+    const total=cart.reduce((s,x)=>s+x.price*x.quantity,0);
+    const order={
+      userId:currentUser.uid,
+      customer:{name:$("shipName").value.trim(),phone:$("shipPhone").value.trim(),address:$("shipAddress").value.trim()},
+      items:cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.quantity})),
+      total,
+      paymentMethod:$("paymentMethod").value,
+      paymentStatus:"pending",
+      status:"pending",
+      createdAt:serverTimestamp()
+    };
+    if(!order.customer.name||!order.customer.phone||!order.customer.address)throw Error("請完整填寫收件資料");
+    const ref=await addDoc(collection(db,"orders"),order);
+    cart=[];saveCart();close("checkoutOverlay");
+    toast(`訂單已建立：${ref.id.slice(0,8)}`);
+    await showOrders();
+  }catch(e){msg.textContent=e.message}
+}
+
+function renderAdminProducts(){
+  const body=$("adminProductList");body.innerHTML="";
+  products.forEach(p=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${escapeHtml(p.name||"")}</td><td>${escapeHtml(p.category||"")}</td><td>${money(p.price)}</td><td>${p.stock??"-"}</td>
+    <td><button class="nav-action" data-edit>編輯</button><button class="nav-action" data-delete>刪除</button></td>`;
+    tr.querySelector("[data-edit]").onclick=()=>editProduct(p);
+    tr.querySelector("[data-delete]").onclick=()=>deleteProduct(p.id);
+    body.appendChild(tr);
+  });
+}
+function editProduct(p){
+  $("productEditor").style.display="block";$("editorTitle").textContent="編輯商品";
+  $("productId").value=p.id;$("pName").value=p.name||"";$("pCategory").value=p.category||"";
+  $("pPrice").value=p.price??0;$("pStock").value=p.stock??0;$("pImage").value=p.image||"";$("pDescription").value=p.description||"";
+}
+function newProduct(){
+  $("productEditor").style.display="block";$("editorTitle").textContent="新增商品";
+  ["productId","pName","pCategory","pPrice","pStock","pImage","pDescription"].forEach(id=>$(id).value="");
+  $("pPrice").value=0;$("pStock").value=0;
+}
+async function saveProduct(){
+  const msg=$("productMsg");msg.textContent="";
+  try{
+    const data={name:$("pName").value.trim(),category:$("pCategory").value.trim(),price:Number($("pPrice").value),stock:Number($("pStock").value),image:$("pImage").value.trim(),description:$("pDescription").value.trim()};
+    if(!data.name||!data.category)throw Error("商品名稱與分類不可空白");
+    const id=$("productId").value;
+    if(id)await updateDoc(doc(db,"products",id),data);
+    else await addDoc(collection(db,"products"),{...data,createdAt:serverTimestamp()});
+    toast("商品已儲存");$("productEditor").style.display="none";await loadProducts();renderAdminProducts();
+  }catch(e){msg.textContent=e.message}
+}
+async function deleteProduct(id){
+  if(!confirm("確定刪除此商品？"))return;
+  try{await deleteDoc(doc(db,"products",id));toast("商品已刪除");await loadProducts();renderAdminProducts()}
+  catch(e){toast("刪除失敗："+e.message)}
+}
+
+onAuthStateChanged(auth,async user=>{
+  currentUser=user;
+  if(user){
+    $("accountBtn").textContent="會員中心";
+    await loadProfile();
+  }else{
+    currentProfile=null;isAdmin=false;$("accountBtn").textContent="會員登入";
+    $("authArea").style.display="block";$("profileArea").style.display="none";
+  }
+});
+
+$("accountBtn").onclick=async()=>{open("accountOverlay");if(currentUser)await loadProfile()};
+$("cartBtn").onclick=()=>open("cartOverlay");
+$("checkoutBtn").onclick=startCheckout;
+$("loginBtn").onclick=login;
+$("registerBtn").onclick=register;
+$("saveProfileBtn").onclick=saveProfile;
+$("logoutBtn").onclick=logout;
+$("ordersBtn").onclick=showOrders;
+$("placeOrderBtn").onclick=placeOrder;
+$("newProductBtn").onclick=newProduct;
+$("saveProductBtn").onclick=saveProduct;
+$("cancelProductBtn").onclick=()=>$("productEditor").style.display="none";
+$("search").oninput=renderProducts;
+
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));
+document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{
+  currentFilter=b.dataset.filter;
+  document.querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x.dataset.filter===currentFilter));
+  renderProducts();
+});
+document.querySelectorAll("[data-auth-tab]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-auth-tab]").forEach(x=>x.classList.toggle("active",x===b));
+  $("loginPanel").classList.toggle("active",b.dataset.authTab==="login");
+  $("registerPanel").classList.toggle("active",b.dataset.authTab==="register");
+});
+
+renderCart();
+loadProducts();
+</script>
+</body>
+</html>
