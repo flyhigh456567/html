@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080f1e" />
+  <title>ARMATURE // 機甲裝備研究所</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080f1e;
+      --panel: #101a2c;
+      --panel-2: #15233a;
+      --line: #2a3c59;
+      --ink: #edf4ff;
+      --muted: #8da1bf;
+      --red: #f04452;
+      --red-dark: #b82436;
+      --yellow: #ffd34d;
+      --blue: #54a9ff;
+      --green: #43d7a5;
+      --radius: 14px;
+      --shadow: 0 18px 60px #0007;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; color: var(--ink); background:
+        radial-gradient(ellipse at 80% 0%, #183b60 0, transparent 35%),
+        linear-gradient(180deg, #080f1e 0%, #0b1322 45%, #080e19 100%);
+      font-family: "Noto Sans TC", system-ui, sans-serif; min-height: 100vh;
+    }
+    body::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .12; z-index: -1;
+      background-image: linear-gradient(#90b4db22 1px, transparent 1px), linear-gradient(90deg, #90b4db22 1px, transparent 1px);
+      background-size: 38px 38px; mask-image: linear-gradient(to bottom, black, transparent 85%); }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+    a { color: inherit; }
+    .container { width: min(1180px, calc(100% - 36px)); margin: auto; }
+    .eyebrow { color: var(--yellow); font: 700 .72rem "Orbitron", sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+    .display { font-family: "Orbitron", "Barlow Condensed", sans-serif; letter-spacing: -.045em; }
+    .muted { color: var(--muted); }
+    .small { font-size: .82rem; }
+    .hidden { display: none !important; }
+
+    /* Header */
+    .topline { height: 5px; background: repeating-linear-gradient(135deg, var(--yellow) 0 14px, #111827 14px 28px); }
+    header { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(18px); background: #080f1eee; border-bottom: 1px solid #253550; }
+    .nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 200px; }
+    .brand-mark { width: 42px; height: 42px; position: relative; background: var(--red); clip-path: polygon(0 0, 75% 0, 100% 28%, 100% 100%, 24% 100%, 0 76%); display: grid; place-items: center; color: white; font: 900 1rem "Orbitron", sans-serif; }
+    .brand-mark::after { content: ""; position: absolute; width: 10px; height: 10px; right: 5px; top: 5px; background: var(--yellow); }
+    .brand-title { display: block; font: 800 .93rem "Orbitron", sans-serif; letter-spacing: .08em; }
+    .brand-sub { display: block; color: var(--muted); font-size: .61rem; letter-spacing: .18em; margin-top: 3px; }
+    .nav-links { display: flex; align-items: center; gap: 25px; color: #b8c6db; font-size: .88rem; }
+    .nav-links a { text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--yellow); }
+    .nav-actions { display: flex; align-items: center; gap: 9px; }
+    .btn { border: 1px solid var(--line); color: var(--ink); background: #142036; border-radius: 7px; padding: 10px 15px; font-weight: 700; transition: transform .18s, border-color .18s, background .18s; }
+    .btn:hover { transform: translateY(-1px); border-color: #7189ac; }
+    .btn-primary { background: var(--red); border-color: var(--red); color: white; box-shadow: 0 7px 20px #f0445226; }
+    .btn-primary:hover { background: #ff5965; border-color: #ff5965; }
+    .btn-yellow { color: #172033; background: var(--yellow); border-color: var(--yellow); }
+    .btn-quiet { background: transparent; }
+    .btn-danger { background: #431923; border-color: #803140; color: #ffb4bb; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .cart-trigger { position: relative; white-space: nowrap; }
+    .cart-count { display: inline-grid; min-width: 20px; height: 20px; place-items: center; padding: 0 5px; margin-left: 5px; background: var(--yellow); border-radius: 99px; color: #111827; font-size: .7rem; font-weight: 900; }
+
+    /* Hero */
+    .hero { padding: 70px 0 55px; overflow: hidden; }
+    .hero-grid { display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; gap: 45px; }
+    .hero-kicker { display: inline-flex; gap: 8px; align-items: center; padding: 7px 10px; border: 1px solid #52647f; background: #10203a99; font: 700 .66rem "Orbitron", sans-serif; letter-spacing: .13em; }
+    .pulse { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 12px var(--green); }
+    h1 { font: 900 clamp(2.5rem, 5.6vw, 5.4rem)/.98 "Barlow Condensed", "Noto Sans TC", sans-serif; letter-spacing: -.035em; margin: 23px 0 17px; }
+    h1 .line-red { color: var(--red); display: block; }
+    .hero p { line-height: 1.9; color: #aab9ce; max-width: 520px; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 27px; }
+    .hero-meta { display: flex; gap: 26px; margin-top: 37px; padding-top: 20px; border-top: 1px solid #2a3c59; }
+    .hero-stat strong { display: block; font: 700 1.16rem "Orbitron", sans-serif; }
+    .hero-stat span { color: var(--muted); font-size: .72rem; }
+    .hero-art { min-height: 440px; position: relative; display: grid; place-items: center; isolation: isolate; }
+    .hero-art::before { content: ""; position: absolute; width: 370px; height: 370px; border: 1px solid #5b7498; border-radius: 50%; box-shadow: 0 0 0 35px #233a5818, 0 0 0 75px #233a5810; }
+    .hero-art::after { content: ""; position: absolute; inset: 12% 3%; z-index: -1; background: linear-gradient(125deg, transparent 35%, #e3444c14 35% 50%, transparent 50%), linear-gradient(35deg, transparent 55%, #ffd34d0b 55% 72%, transparent 72%); }
+    .mecha-frame { position: relative; width: min(100%, 450px); aspect-ratio: 1; display: grid; place-items: center; }
+    .mecha-frame svg { width: 100%; height: 100%; filter: drop-shadow(0 18px 25px #0008); animation: float 5s ease-in-out infinite; }
+    .scanline { position: absolute; left: 0; right: 0; top: 40%; height: 1px; background: #66c7ff88; box-shadow: 0 0 12px #66c7ff; animation: scan 5s ease-in-out infinite; }
+    .art-label { position: absolute; padding: 10px 12px; border: 1px solid #405774; background: #0a1425df; font: 700 .66rem "Orbitron", sans-serif; letter-spacing: .12em; }
+    .label-top { top: 8%; right: -1%; }
+    .label-bottom { bottom: 7%; left: -1%; }
+    .art-cross { position: absolute; width: 15px; height: 15px; border-left: 2px solid var(--yellow); border-top: 2px solid var(--yellow); }
+    .cross-1 { top: 8%; left: 10%; } .cross-2 { bottom: 13%; right: 7%; transform: rotate(180deg); }
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-10px) rotate(1deg); } }
+    @keyframes scan { 0%,100% { transform: translateY(-90px); opacity: .2; } 50% { transform: translateY(130px); opacity: .85; } }
+
+    /* Info strip / products */
+    .spec-strip { border-top: 1px solid #293c57; border-bottom: 1px solid #293c57; background: #0d1728b8; }
+    .spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .spec-item { padding: 21px 18px; display: flex; gap: 12px; align-items: center; border-right: 1px solid #293c57; }
+    .spec-item:first-child { border-left: 1px solid #293c57; }
+    .spec-icon { color: var(--yellow); font: 900 1.3rem "Orbitron", sans-serif; }
+    .spec-item strong { display: block; font-size: .86rem; }
+    .spec-item span { color: var(--muted); font-size: .72rem; }
+    section { scroll-margin-top: 95px; }
+    .section { padding: 75px 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 25px; margin-bottom: 28px; }
+    .section-head h2 { margin: 9px 0 0; font: 800 clamp(2rem, 3.5vw, 3rem)/1 "Barlow Condensed", sans-serif; }
+    .section-head p { max-width: 450px; color: var(--muted); line-height: 1.8; margin: 0; font-size: .88rem; }
+    .catalog-controls { display: flex; gap: 10px; margin: 0 0 22px; }
+    .field { width: 100%; min-width: 0; padding: 11px 12px; background: #0b1424; color: var(--ink); border: 1px solid #31435f; border-radius: 7px; }
+    .field::placeholder { color: #687d9a; }
+    .catalog-controls .field:first-child { max-width: 360px; }
+    .catalog-controls select { max-width: 200px; }
+    .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .product-card { overflow: hidden; border: 1px solid #2b3e5a; border-radius: 10px; background: linear-gradient(145deg, #17243a, #0d1626 65%); transition: transform .22s, border-color .22s, box-shadow .22s; }
+    .product-card:hover { transform: translateY(-4px); border-color: #5b789f; box-shadow: 0 18px 34px #0003; }
+    .product-image { position: relative; aspect-ratio: 1.27 / 1; background: radial-gradient(circle at 50% 35%, #27466b, #111b2d 68%); overflow: hidden; cursor: pointer; }
+    .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .product-card:hover .product-image img { transform: scale(1.035); }
+    .product-tag { position: absolute; top: 12px; left: 12px; padding: 5px 8px; background: var(--yellow); color: #172033; font: 800 .62rem "Orbitron", sans-serif; letter-spacing: .08em; }
+    .stock-tag { position: absolute; bottom: 10px; right: 10px; padding: 4px 7px; background: #08111ddd; color: #d0dcef; font-size: .67rem; border: 1px solid #51627e; }
+    .product-body { padding: 16px; }
+    .product-category { color: var(--blue); font: 700 .64rem "Orbitron", sans-serif; letter-spacing: .1em; }
+    .product-title { margin: 7px 0 8px; font-size: 1.03rem; font-weight: 800; cursor: pointer; }
+    .product-desc { margin: 0; min-height: 43px; color: var(--muted); font-size: .78rem; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-bottom { margin-top: 17px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .price { font: 800 1.2rem "Orbitron", sans-serif; color: white; }
+    .price small { font: 500 .65rem "Noto Sans TC", sans-serif; color: var(--muted); }
+    .add-btn { padding: 9px 11px; font-size: .77rem; }
+    .empty-state { padding: 50px 22px; text-align: center; border: 1px dashed #405574; border-radius: 10px; background: #0d172899; color: var(--muted); grid-column: 1 / -1; }
+    .empty-state strong { display: block; color: var(--ink); margin: 10px 0; }
+
+    /* Admin */
+    .admin-section { padding: 55px 0 75px; background: #0e1829; border-top: 1px solid #2a3c59; border-bottom: 1px solid #2a3c59; }
+    .admin-warning { color: #ffe5a0; background: #302816; border: 1px solid #6b5526; border-radius: 7px; padding: 12px 14px; font-size: .8rem; line-height: 1.7; margin: 18px 0 24px; }
+    .admin-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: 25px; }
+    .panel { padding: 22px; background: #111d30; border: 1px solid #30435f; border-radius: 10px; }
+    .panel h3 { margin: 0 0 18px; font: 700 1.15rem "Barlow Condensed", sans-serif; letter-spacing: .06em; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 13px; min-width: 0; }
+    .form-row label { color: #c1cde0; font-size: .78rem; font-weight: 700; }
+    .form-row.full { grid-column: 1 / -1; }
+    textarea.field { resize: vertical; min-height: 90px; }
+    .check-line { display: flex; align-items: center; gap: 9px; font-size: .82rem; color: #cbd7e9; }
+    .check-line input { accent-color: var(--red); width: 17px; height: 17px; }
+    .image-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
+    .image-preview img { width: 65px; height: 65px; border-radius: 6px; border: 1px solid #415875; object-fit: cover; }
+    .admin-list { display: flex; flex-direction: column; gap: 10px; max-height: 580px; overflow: auto; }
+    .admin-row { display: flex; align-items: center; gap: 11px; padding: 10px; background: #0b1423; border: 1px solid #263852; border-radius: 8px; }
+    .admin-row img { width: 54px; height: 54px; object-fit: cover; border-radius: 5px; }
+    .admin-row-main { flex: 1; min-width: 0; }
+    .admin-row-main strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .82rem; }
+    .admin-row-main span { color: var(--muted); font-size: .7rem; }
+    .admin-row-actions { display: flex; gap: 5px; }
+    .admin-row-actions .btn { padding: 7px 8px; font-size: .7rem; }
+    .orders-box { margin-top: 25px; }
+    .order-row { padding: 12px 0; border-bottom: 1px solid #293c57; display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: .8rem; }
+    .status-chip { display: inline-block; border: 1px solid #826d34; color: #ffdf77; background: #332b18; border-radius: 4px; padding: 3px 6px; font-size: .66rem; }
+
+    /* Dialogs */
+    dialog { width: min(560px, calc(100% - 24px)); max-height: 90vh; padding: 0; border: 1px solid #3a5273; border-radius: 13px; background: #101a2b; color: var(--ink); box-shadow: var(--shadow); overflow: auto; }
+    dialog::backdrop { background: #020611c9; backdrop-filter: blur(5px); }
+    dialog.wide { width: min(900px, calc(100% - 24px)); }
+    .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 21px; border-bottom: 1px solid #2c3e59; background: #121f33; position: sticky; top: 0; z-index: 2; }
+    .dialog-head h2 { font: 800 1.25rem "Barlow Condensed", sans-serif; margin: 0; letter-spacing: .05em; }
+    .icon-btn { border: 1px solid #3d526e; border-radius: 6px; color: var(--ink); background: #17253b; width: 34px; height: 34px; font-size: 1.15rem; }
+    .dialog-body { padding: 21px; }
+    .tabs { display: flex; gap: 8px; padding: 0 21px; margin-top: 18px; }
+    .tab-btn { flex: 1; padding: 10px; color: var(--muted); background: transparent; border: 1px solid #2c3e59; border-radius: 6px; font-weight: 800; }
+    .tab-btn.active { color: white; border-color: var(--red); background: #5b1e2b55; }
+    .form-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 15px; }
+    .form-note { color: var(--muted); font-size: .74rem; line-height: 1.7; margin: 12px 0 0; }
+    .profile-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    .product-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr); gap: 24px; }
+    .detail-main-image { border: 1px solid #2f4360; background: #0b1423; border-radius: 8px; overflow: hidden; aspect-ratio: 1 / 1; }
+    .detail-main-image img { width: 100%; height: 100%; object-fit: contain; }
+    .thumbs { display: flex; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
+    .thumb { width: 63px; height: 63px; border: 1px solid #354968; padding: 0; background: #0b1423; border-radius: 5px; overflow: hidden; }
+    .thumb.active { border: 2px solid var(--yellow); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-info h3 { font-size: 1.5rem; margin: 9px 0; }
+    .detail-price { font: 800 1.7rem "Orbitron", sans-serif; margin: 15px 0; }
+    .detail-description { white-space: pre-wrap; color: #bac8dc; font-size: .87rem; line-height: 1.9; }
+    .detail-meta { border-top: 1px solid #2e405c; border-bottom: 1px solid #2e405c; padding: 12px 0; margin: 15px 0; display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); }
+    .cart-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .cart-row { display: grid; grid-template-columns: 68px minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #293c57; }
+    .cart-row img { width: 68px; height: 68px; object-fit: cover; background: #0b1423; border-radius: 6px; }
+    .cart-row strong { display: block; font-size: .83rem; }
+    .cart-row span { color: var(--muted); font-size: .76rem; }
+    .qty-control { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .qty-control button { background: #1b2b43; border: 1px solid #354a68; color: white; width: 25px; height: 25px; border-radius: 4px; }
+    .cart-total { padding: 14px 0; border-top: 1px solid #384d6b; }
+    .total-line { display: flex; justify-content: space-between; margin: 8px 0; color: #bac8dc; font-size: .87rem; }
+    .total-line.final { padding-top: 12px; margin-top: 13px; border-top: 1px solid #384d6b; color: white; font-size: 1.02rem; font-weight: 800; }
+    .checkout-warning { background: #2a2414; border: 1px solid #66542a; color: #ffe6a4; padding: 10px 12px; border-radius: 6px; font-size: .76rem; line-height: 1.7; margin-bottom: 16px; }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 100; max-width: min(390px, calc(100% - 36px)); background: #172740; color: #eff6ff; border: 1px solid #4a6487; border-left: 4px solid var(--green); padding: 13px 16px; border-radius: 7px; box-shadow: var(--shadow); font-size: .85rem; opacity: 0; transform: translateY(12px); pointer-events: none; transition: .25s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { border-left-color: var(--red); }
+    footer { padding: 35px 0; color: #7d91ae; font-size: .75rem; }
+    .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 18px; border-top: 1px solid #283a55; padding-top: 23px; }
+    .footer-mark { color: #c6d4e8; font: 700 .72rem "Orbitron", sans-serif; letter-spacing: .14em; }
+    @media (max-width: 900px) {
+      .nav-links { display: none; } .hero-grid { grid-template-columns: 1fr; gap: 5px; } .hero { padding-top: 48px; } .hero-art { min-height: 350px; } .mecha-frame { max-width: 370px; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } .admin-grid { grid-template-columns: 1fr; } .spec-grid { grid-template-columns: repeat(2, 1fr); } .spec-item:nth-child(3) { border-left: 1px solid #293c57; } .spec-item:nth-child(3), .spec-item:nth-child(4) { border-top: 1px solid #293c57; }
+    }
+    @media (max-width: 560px) {
+      .container { width: min(100% - 24px, 1180px); } .nav { min-height: 66px; gap: 8px; } .brand { min-width: 0; gap: 8px; } .brand-mark { width: 35px; height: 35px; font-size: .8rem; } .brand-title { font-size: .74rem; } .brand-sub { font-size: .52rem; } .nav-actions { gap: 5px; } .nav-actions .btn { padding: 9px 8px; font-size: .73rem; }
+      .hero { padding: 40px 0 35px; } h1 { font-size: clamp(2.5rem, 14vw, 4rem); } .hero-art { min-height: 290px; } .hero-art::before { width: 250px; height: 250px; } .art-label { font-size: .53rem; } .hero-meta { gap: 16px; } .hero-stat strong { font-size: 1rem; }
+      .spec-item { padding: 15px 10px; gap: 8px; } .spec-item strong { font-size: .75rem; } .spec-item span { font-size: .64rem; }
+      .section { padding: 52px 0; } .section-head { display: block; } .section-head p { margin-top: 13px; } .catalog-controls { flex-wrap: wrap; } .catalog-controls .field:first-child, .catalog-controls select { max-width: unset; }
+      .product-grid { grid-template-columns: 1fr; } .product-image { aspect-ratio: 1.25 / 1; } .form-grid { grid-template-columns: 1fr; } .form-row.full { grid-column: auto; } .panel { padding: 15px; }
+      .product-detail { grid-template-columns: 1fr; } .detail-main-image { max-height: 340px; } .dialog-body { padding: 15px; } .cart-row { grid-template-columns: 55px minmax(0,1fr); } .cart-row > .cart-price { grid-column: 2; } .cart-row img { width: 55px; height: 55px; }
+      .footer-row { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#home" aria-label="ARMATURE 首頁">
+        <span class="brand-mark">A/</span>
+        <span><span class="brand-title">ARMATURE</span><span class="brand-sub">MECHA SUPPLY DIVISION</span></span>
+      </a>
+      <nav class="nav-links" aria-label="主要導覽">
+        <a href="#products">裝備目錄</a><a href="#about">作戰規格</a><a href="#adminPanel" id="adminNav" class="hidden">管理控制台</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn btn-quiet" id="accountButton">登入 / 註冊</button>
+        <button class="btn btn-primary cart-trigger" id="cartButton">購物車 <span class="cart-count" id="cartCount">0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div>
+          <div class="hero-kicker"><span class="pulse"></span> ARMATURE / SUPPLY ONLINE</div>
+          <h1>GEAR UP.<span class="line-red">STAND OUT.</span></h1>
+          <p>為熱愛機甲設計與模型文化的人，蒐集具有鮮明線條、戰術配色與機械美學的裝備。從桌面收藏到模型工具，打造你的專屬整備基地。</p>
+          <div class="hero-actions"><a class="btn btn-primary" href="#products">探索裝備目錄 ↗</a><button class="btn" id="heroAccountButton">啟動會員識別</button></div>
+          <div class="hero-meta">
+            <div class="hero-stat"><strong>01 / 04</strong><span>配色靈感｜白・藍・紅・金</span></div>
+            <div class="hero-stat"><strong>MODULAR</strong><span>收藏、展示、整備</span></div>
+            <div class="hero-stat"><strong>ONLINE</strong><span>會員專屬購物體驗</span></div>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="機甲風格主視覺插畫">
+          <span class="art-cross cross-1"></span><span class="art-cross cross-2"></span>
+          <span class="art-label label-top">UNIT 01 // READY</span><span class="art-label label-bottom">SYSTEM: ARMATURE</span><span class="scanline"></span>
+          <div class="mecha-frame">
+            <svg viewBox="0 0 440 440" role="img" aria-label="原創機甲頭像插畫">
+              <defs>
+                <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7fbff"/><stop offset=".48" stop-color="#bcc9d9"/><stop offset="1" stop-color="#6f829b"/></linearGradient>
+                <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#60bcff"/><stop offset="1" stop-color="#14508d"/></linearGradient>
+                <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff6670"/><stop offset="1" stop-color="#a7192c"/></linearGradient>
+              </defs>
+              <ellipse cx="223" cy="367" rx="125" ry="20" fill="#010712" opacity=".65"/>
+              <path d="M148 106 103 45 160 69 188 25 215 89 245 28 275 75 330 49 301 119 326 168 300 236 285 300 242 328 179 305 151 253 118 190Z" fill="#1a2d45" stroke="#8aa0ba" stroke-width="4"/>
+              <path d="M146 112 113 59 157 80 184 43 207 108 241 45 268 91 311 67 286 128 300 165 273 228 260 284 231 302 187 282 168 235 140 188Z" fill="url(#armor)" stroke="#eaf3ff" stroke-width="3"/>
+              <path d="M178 110 205 91 240 99 263 126 251 171 220 190 185 168 167 139Z" fill="#1a2b43" stroke="#314f70" stroke-width="3"/>
+              <path d="M176 136 207 126 254 138 240 152 194 151Z" fill="url(#blue)" stroke="#65c6ff" stroke-width="2"/>
+              <path d="M158 102 137 92 152 142 173 153 184 130Z" fill="url(#red)" stroke="#ffc2c5" stroke-width="2"/>
+              <path d="M268 105 290 91 278 143 257 154 249 131Z" fill="url(#red)" stroke="#ffc2c5" stroke-width="2"/>
+              <path d="M206 169 220 181 234 169 243 194 223 221 201 193Z" fill="#ffd34d" stroke="#8e6d17" stroke-width="3"/>
+              <path d="M191 191 219 215 251 188 262 222 243 251 222 270 196 247 177 219Z" fill="url(#blue)" stroke="#bddcff" stroke-width="3"/>
+              <path d="M190 212 211 228 197 247 177 224Z" fill="url(#red)"/><path d="M250 210 231 229 244 247 263 224Z" fill="url(#red)"/>
+              <path d="M181 267 220 286 258 264 278 303 244 331 202 329 167 302Z" fill="url(#armor)" stroke="#dfeaff" stroke-width="3"/>
+              <path d="M199 284 220 296 241 284 238 315 220 323 201 312Z" fill="#243951" stroke="#4d6c8f" stroke-width="2"/>
+              <path d="M118 171 143 156 164 194 149 236 129 222Z" fill="url(#blue)" stroke="#8ad3ff" stroke-width="3"/>
+              <path d="M285 177 310 158 326 204 307 230 289 220Z" fill="url(#blue)" stroke="#8ad3ff" stroke-width="3"/>
+              <path d="M142 236 166 231 181 268 162 293 144 273Z" fill="url(#red)" stroke="#ffb6bc" stroke-width="2"/>
+              <path d="M286 234 309 228 308 269 285 294 269 270Z" fill="url(#red)" stroke="#ffb6bc" stroke-width="2"/>
+              <path d="M184 329 210 333 205 365 177 365Z" fill="#50637b" stroke="#a5b9d0" stroke-width="3"/>
+              <path d="M230 333 255 328 267 363 238 366Z" fill="#50637b" stroke="#a5b9d0" stroke-width="3"/>
+              <path d="M174 362 207 362 218 382 163 382Z" fill="#d7e3f1" stroke="#ffffff" stroke-width="2"/>
+              <path d="M237 362 269 360 282 382 228 382Z" fill="#d7e3f1" stroke="#ffffff" stroke-width="2"/>
+              <path d="M81 139 122 105 143 117 123 170 95 190Z" fill="#ffd34d" stroke="#fff1ad" stroke-width="3"/>
+              <path d="M326 125 359 151 343 190 316 171Z" fill="#ffd34d" stroke="#fff1ad" stroke-width="3"/>
+              <path d="M84 141 104 113 116 143 95 166Z" fill="#f04452"/><path d="M348 153 360 173 342 191 332 168Z" fill="#f04452"/>
+              <g stroke="#08111f" stroke-width="4"><path d="M131 197h26M290 197h23M188 259h63M184 304h71"/></g>
+              <g fill="#6ed4ff"><circle cx="182" cy="184" r="3"/><circle cx="257" cy="184" r="3"/><circle cx="160" cy="247" r="3"/><circle cx="280" cy="247" r="3"/></g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="spec-strip" id="about">
+      <div class="container spec-grid">
+        <div class="spec-item"><span class="spec-icon">01</span><div><strong>機甲配色系統</strong><span>深藍・警示紅・識別金</span></div></div>
+        <div class="spec-item"><span class="spec-icon">02</span><div><strong>多角度商品展示</strong><span>主圖＋細節圖集</span></div></div>
+        <div class="spec-item"><span class="spec-icon">03</span><div><strong>會員與訂單管理</strong><span>登入後保存會員資料</span></div></div>
+        <div class="spec-item"><span class="spec-icon">04</span><div><strong>Firebase 雲端資料</strong><span>Firestore＋Storage</span></div></div>
+      </div>
+    </div>
+
+    <section class="section" id="products">
+      <div class="container">
+        <div class="section-head">
+          <div><div class="eyebrow">01 / SUPPLY CATALOG</div><h2>裝備目錄 <span style="color:var(--red)">/ CATALOG</span></h2></div>
+          <p>搜尋你的下一件收藏。點開商品即可查看細節圖、規格與庫存；管理員登入後可建立及維護商品資料。</p>
+        </div>
+        <div class="catalog-controls">
+          <input class="field" id="searchInput" type="search" placeholder="搜尋商品名稱、型號或關鍵字…" aria-label="搜尋商品" />
+          <select class="field" id="categoryFilter" aria-label="商品分類"><option value="all">所有分類</option></select>
+          <select class="field" id="sortFilter" aria-label="商品排序"><option value="newest">最新上架</option><option value="priceLow">價格由低至高</option><option value="priceHigh">價格由高至低</option></select>
+        </div>
+        <div class="product-grid" id="productGrid"><div class="empty-state"><span class="eyebrow">CONNECTING TO DATABASE</span><strong>正在同步裝備資料…</strong><span>請稍候片刻。</span></div></div>
+      </div>
+    </section>
+
+    <section class="admin-section hidden" id="adminPanel">
+      <div class="container">
+        <div class="section-head">
+          <div><div class="eyebrow">02 / COMMAND DECK</div><h2>管理控制台 <span style="color:var(--red)">/ ADMIN</span></h2></div>
+          <p>管理員限定。建立、編輯、上架或下架商品，並查看訂單。商品圖片上傳至 Firebase Storage。</p>
+        </div>
+        <div class="admin-warning">權限設定提醒：需先將你的 Firebase Authentication UID 同步填入 HTML、Firestore Rules、Storage Rules 的管理員清單。不要使用可由一般會員自行修改的 users.role 欄位當作管理員依據。</div>
+        <div class="admin-grid">
+          <div class="panel">
+            <h3 id="productFormTitle">＋ 建立新商品 / NEW UNIT</h3>
+            <form id="productForm">
+              <input type="hidden" id="editProductId" />
+              <div class="form-grid">
+                <div class="form-row"><label for="productName">商品名稱 *</label><input class="field" id="productName" maxlength="100" required placeholder="例：RX-78 桌上收藏模型" /></div>
+                <div class="form-row"><label for="productSku">型號 / SKU</label><input class="field" id="productSku" maxlength="50" placeholder="例：ARM-001" /></div>
+                <div class="form-row"><label for="productCategory">商品分類 *</label><input class="field" id="productCategory" maxlength="40" required placeholder="模型／工具／收藏" /></div>
+                <div class="form-row"><label for="productPrice">售價（NT$）*</label><input class="field" id="productPrice" type="number" min="0" step="1" required placeholder="1280" /></div>
+                <div class="form-row"><label for="productStock">庫存數量 *</label><input class="field" id="productStock" type="number" min="0" step="1" required value="1" /></div>
+                <div class="form-row"><label for="productMainImage">商品主圖 *</label><input class="field" id="productMainImage" type="file" accept="image/*" /></div>
+                <div class="form-row full"><label for="productGallery">商品多張細節圖（可複選）</label><input class="field" id="productGallery" type="file" accept="image/*" multiple /><div class="image-preview" id="imagePreview"></div><div class="form-note">每張圖片上限 8 MB。建立新商品時必須上傳主圖；編輯既有商品時可留空以保留原圖。</div></div>
+                <div class="form-row full"><label for="productDescription">商品描述與規格 *</label><textarea class="field" id="productDescription" required maxlength="5000" placeholder="材質、尺寸、內容物、注意事項等"></textarea></div>
+                <div class="form-row full"><label class="check-line"><input id="productPublished" type="checkbox" checked />立即上架（未勾選則僅管理員看得到）</label></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" type="submit" id="saveProductButton">儲存商品資料</button><button class="btn hidden" type="button" id="cancelEditButton">取消編輯</button><button class="btn btn-quiet" type="reset" id="resetProductButton">清空表單</button></div>
+            </form>
+          </div>
+          <div class="panel">
+            <h3>商品資料庫 / INVENTORY</h3>
+            <div class="admin-list" id="adminProductList"><div class="muted small">尚無商品資料。</div></div>
+          </div>
+        </div>
+        <div class="panel orders-box">
+          <h3>訂單總覽 / ORDER MANIFEST</h3>
+          <div id="adminOrderList" class="muted small">登入管理員後可讀取訂單。</div>
+          <p class="form-note">注意：此版本訂單為「測試訂單／待付款」狀態，並非金流收款紀錄。正式付款成功與訂單狀態更新應由可信任的後端驗證金流通知後執行。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="container footer-row"><div><div class="footer-mark">ARMATURE // MECHA SUPPLY DIVISION</div><div style="margin-top:8px">為你的收藏建立整備基地。</div></div><div>© <span id="yearNow"></span> ARMATURE. UI demo powered by Firebase.</div></div></footer>
+
+  <!-- Authentication -->
+  <dialog id="authDialog">
+    <div class="dialog-head"><h2>會員識別 / PILOT ACCESS</h2><button class="icon-btn" data-close="authDialog" aria-label="關閉">×</button></div>
+    <div class="tabs"><button type="button" class="tab-btn active" data-auth-mode="login">會員登入</button><button type="button" class="tab-btn" data-auth-mode="signup">建立帳號</button></div>
+    <div class="dialog-body">
+      <form id="authForm">
+        <div class="form-row"><label for="authEmail">電子郵件 *</label><input class="field" id="authEmail" type="email" autocomplete="email" required placeholder="pilot@example.com" /></div>
+        <div class="form-row"><label for="authPassword">密碼 *（至少 6 碼）</label><input class="field" id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="輸入密碼" /></div>
+        <div class="form-row hidden" id="signupNameRow"><label for="signupName">會員名稱 *</label><input class="field" id="signupName" maxlength="60" autocomplete="name" placeholder="怎麼稱呼你？" /></div>
+        <div class="form-actions"><button class="btn btn-primary" type="submit" id="authSubmit">登入</button><button class="btn btn-quiet" type="button" id="resetPasswordButton">寄送重設密碼信</button></div>
+        <p class="form-note" id="authHint">使用已註冊的電子郵件與密碼登入。</p>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Member center -->
+  <dialog id="memberDialog" class="wide">
+    <div class="dialog-head"><h2>會員中心 / PILOT PROFILE</h2><button class="icon-btn" data-close="memberDialog" aria-label="關閉">×</button></div>
+    <div class="dialog-body">
+      <div class="profile-layout">
+        <div class="panel">
+          <h3>會員資料 / PROFILE DATA</h3>
+          <form id="profileForm">
+            <div class="form-row"><label for="profileEmail">登入電子郵件</label><input class="field" id="profileEmail" type="email" disabled /></div>
+            <div class="form-row"><label for="profileName">會員名稱 *</label><input class="field" id="profileName" maxlength="60" required /></div>
+            <div class="form-row"><label for="profilePhone">聯絡電話</label><input class="field" id="profilePhone" maxlength="30" autocomplete="tel" /></div>
+            <div class="form-row"><label for="profileAddress">收件地址</label><textarea class="field" id="profileAddress" maxlength="300" autocomplete="street-address" rows="2"></textarea></div>
+            <div class="form-actions"><button class="btn btn-primary" type="submit">儲存會員資料</button><button class="btn btn-danger" type="button" id="signOutButton">登出會員</button></div>
+          </form>
+        </div>
+        <div class="panel">
+          <h3>我的訂單 / ORDER HISTORY</h3>
+          <div id="memberOrderList" class="muted small">讀取訂單中…</div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Product detail -->
+  <dialog id="productDialog" class="wide">
+    <div class="dialog-head"><h2>商品規格 / UNIT DOSSIER</h2><button class="icon-btn" data-close="productDialog" aria-label="關閉">×</button></div>
+    <div class="dialog-body" id="productDetailContent"></div>
+  </dialog>
+
+  <!-- Cart and checkout -->
+  <dialog id="cartDialog" class="wide">
+    <div class="dialog-head"><h2>購物車 / LOADOUT</h2><button class="icon-btn" data-close="cartDialog" aria-label="關閉">×</button></div>
+    <div class="dialog-body">
+      <div class="cart-list" id="cartItems"></div>
+      <div class="cart-total"><div class="total-line"><span>商品小計</span><strong id="cartSubtotal">NT$ 0</strong></div><div class="total-line"><span>運費（滿 NT$ 1,500 免運）</span><strong id="cartShipping">NT$ 0</strong></div><div class="total-line final"><span>應付總額（測試預估）</span><strong id="cartTotal">NT$ 0</strong></div></div>
+      <div class="checkout-warning">測試結帳：目前只會建立「待付款」訂單，不會收取款項。信用卡、ATM、超商付款等正式金流尚未串接；上線前必須由後端重新核價並驗證金流業者的付款通知。</div>
+      <form id="checkoutForm">
+        <div class="form-grid">
+          <div class="form-row"><label for="checkoutName">收件人 *</label><input class="field" id="checkoutName" required maxlength="60" /></div>
+          <div class="form-row"><label for="checkoutPhone">聯絡電話 *</label><input class="field" id="checkoutPhone" required maxlength="30" /></div>
+          <div class="form-row full"><label for="checkoutAddress">收件地址 *</label><textarea class="field" id="checkoutAddress" required maxlength="300" rows="2"></textarea></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-primary" id="placeOrderButton" type="submit">送出測試訂單（不扣款）</button><button class="btn btn-quiet" type="button" data-close="cartDialog">繼續選購</button></div>
+      </form>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+    import {
+      getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+      signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile
+    } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+    import {
+      getFirestore, collection, doc, getDoc, getDocs, query, where,
+      addDoc, setDoc, updateDoc, deleteDoc, serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js';
+
+    // Firebase Web config. Firebase API keys identify the project; authorize access with Security Rules.
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6CS8xj4vAogH1pIuO8dgcOz2xFTpCs",
+      authDomain: "flyproject-8234c.firebaseapp.com",
+      projectId: "flyproject-8234c",
+      storageBucket: "flyproject-8234c.firebasestorage.app",
+      messagingSenderId: "822657654816",
+      appId: "1:822657654816:web:4f72cfe21387a7f1761c45",
+      measurementId: "G-8JCSH70PKW"
+    };
+
+    // IMPORTANT: Replace this entry with your own Firebase Authentication UID.
+    // The exact same UID must be added to firestore.rules and storage.rules.
+    const ADMIN_UIDS = ['PASTE_ADMIN_UID_HERE'];
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    let currentUser = null;
+    let currentProfile = {};
+    let isAdmin = false;
+    let products = [];
+    let cart = loadCart();
+    let authMode = 'login';
+    let activeDetailProduct = null;
+    let activeDetailImages = [];
+    let editingProduct = null;
+    let toastTimer = null;
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const money = value => new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', maximumFractionDigits: 0 }).format(Number(value) || 0);
+    const timestampMs = value => value?.toDate ? value.toDate().getTime() : 0;
+    const dateText = value => value?.toDate ? value.toDate().toLocaleString('zh-TW') : '處理中';
+    const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+
+    function notify(message, type = 'success') {
+      const toast = $('#toast');
+      toast.textContent = message;
+      toast.classList.toggle('error', type === 'error');
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3600);
+    }
+    function explainError(error) {
+      const messages = {
+        'auth/email-already-in-use': '此電子郵件已註冊，請改用登入。',
+        'auth/invalid-email': '電子郵件格式不正確。',
+        'auth/weak-password': '密碼強度不足，請使用至少 6 碼。',
+        'auth/invalid-credential': '電子郵件或密碼錯誤。',
+        'auth/user-not-found': '找不到此會員，請確認電子郵件。',
+        'auth/wrong-password': '密碼不正確。',
+        'auth/too-many-requests': '嘗試次數過多，請稍後再試。',
+        'permission-denied': '資料庫拒絕此操作，請確認 Firebase Rules 與管理員 UID 設定。',
+        'storage/unauthorized': '圖片上傳遭拒，請確認 Storage Rules 與管理員 UID 設定。',
+        'storage/canceled': '圖片上傳已取消。'
+      };
+      return messages[error?.code] || error?.message || '操作失敗，請稍後再試。';
+    }
+    function openDialog(id) { const dialog = document.getElementById(id); if (dialog && !dialog.open) dialog.showModal(); }
+    function closeDialog(id) { const dialog = document.getElementById(id); if (dialog?.open) dialog.close(); }
+
+    function placeholderImage(label = 'ARMATURE', color = '#f04452') {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 470"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#263f60"/><stop offset="1" stop-color="#091323"/></linearGradient></defs><rect width="600" height="470" fill="url(#g)"/><g fill="none" stroke="#7895b8" opacity=".35"><path d="M0 80H600M0 150H600M0 220H600M0 290H600M0 360H600M60 0V470M130 0V470M200 0V470M270 0V470M340 0V470M410 0V470M480 0V470M550 0V470"/><circle cx="300" cy="210" r="125" stroke-width="2"/><circle cx="300" cy="210" r="94" stroke-width="1"/></g><path d="M220 130 260 92 335 105 380 163 350 239 300 277 245 246 204 185Z" fill="#c7d3e0" stroke="#eef5ff" stroke-width="5"/><path d="M247 167 297 151 347 169 322 191 270 190Z" fill="#1b5f99" stroke="#73c5ff" stroke-width="3"/><path d="M300 190 318 212 300 240 282 212Z" fill="${color}"/><path d="M214 136 182 101 193 162 225 188M376 136 409 101 398 162 365 188" fill="${color}" stroke="#ffd34d" stroke-width="4"/><text x="24" y="420" fill="#ffd34d" font-family="Arial,sans-serif" font-size="18" letter-spacing="5">ARMATURE // UNIT DATA</text><text x="24" y="449" fill="#e9f3ff" font-family="Arial,sans-serif" font-weight="bold" font-size="21">${escapeHTML(label).slice(0, 30)}</text></svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+    function loadCart() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem('armatureCart') || '[]');
+        return Array.isArray(parsed) ? parsed.filter(item => item && typeof item.productId === 'string' && Number(item.qty) > 0).map(item => ({ productId: item.productId, qty: Math.max(1, Math.min(99, Number(item.qty) || 1)) })) : [];
+      } catch { return []; }
+    }
+    function saveCart() {
+      localStorage.setItem('armatureCart', JSON.stringify(cart));
+      updateCartCount();
+    }
+    function updateCartCount() { $('#cartCount').textContent = cart.reduce((sum, item) => sum + item.qty, 0); }
+    function getProduct(productId) { return products.find(product => product.id === productId); }
+
+    async function loadProducts() {
+      $('#productGrid').innerHTML = '<div class="empty-state"><span class="eyebrow">DATABASE SYNC</span><strong>同步商品資料中…</strong></div>';
+      try {
+        const productQuery = isAdmin
+          ? collection(db, 'products')
+          : query(collection(db, 'products'), where('isPublished', '==', true));
+        const snapshot = await getDocs(productQuery);
+        products = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+        products.sort((a, b) => timestampMs(b.createdAt) - timestampMs(a.createdAt));
+        renderProducts();
+        if (isAdmin) renderAdminProducts();
+      } catch (error) {
+        console.error(error);
+        products = [];
+        $('#productGrid').innerHTML = `<div class="empty-state"><span class="eyebrow">DATABASE ERROR</span><strong>無法讀取商品資料</strong><span>${escapeHTML(explainError(error))}</span><p class="small">請確認 Firestore Database 已建立且已發佈對應 Rules。</p></div>`;
+      }
+    }
+
+    function renderProducts() {
+      const search = $('#searchInput').value.trim().toLowerCase();
+      const category = $('#categoryFilter').value;
+      const sort = $('#sortFilter').value;
+      const categories = [...new Set(products.map(p => p.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh-TW'));
+      const oldCategory = $('#categoryFilter').value;
+      $('#categoryFilter').innerHTML = '<option value="all">所有分類</option>' + categories.map(item => `<option value="${escapeHTML(item)}">${escapeHTML(item)}</option>`).join('');
+      $('#categoryFilter').value = categories.includes(oldCategory) ? oldCategory : 'all';
+      let filtered = products.filter(p => {
+        const searchable = `${p.title || ''} ${p.sku || ''} ${p.category || ''} ${p.description || ''}`.toLowerCase();
+        return searchable.includes(search) && ($('#categoryFilter').value === 'all' || p.category === $('#categoryFilter').value) && (isAdmin || p.isPublished === true);
+      });
+      if (sort === 'priceLow') filtered.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+      if (sort === 'priceHigh') filtered.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+      if (sort === 'newest') filtered.sort((a, b) => timestampMs(b.createdAt) - timestampMs(a.createdAt));
+      const grid = $('#productGrid');
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="empty-state"><span class="eyebrow">NO UNIT FOUND</span><strong>${products.length ? '找不到符合條件的裝備' : '裝備庫目前尚無上架商品'}</strong><span>${products.length ? '試試其他關鍵字或分類。' : (isAdmin ? '請在下方管理控制台建立第一筆商品，並勾選「立即上架」。' : '管理員上架商品後，會在這裡顯示。')}</span></div>`;
+        return;
+      }
+      grid.innerHTML = filtered.map(p => `
+        <article class="product-card">
+          <div class="product-image" data-view-product="${escapeHTML(p.id)}" tabindex="0" role="button" aria-label="查看 ${escapeHTML(p.title)} 詳情">
+            <img src="${escapeHTML(p.mainImage || placeholderImage(p.title))}" alt="${escapeHTML(p.title)}" loading="lazy" onerror="this.onerror=null;this.src='${placeholderImage('UNIT IMAGE ERROR')}';" />
+            <span class="product-tag">${escapeHTML(p.sku || 'FIELD GEAR')}</span>
+            <span class="stock-tag">${Number(p.stock || 0) > 0 ? `庫存 ${Number(p.stock)}` : '暫無庫存'}</span>
+          </div>
+          <div class="product-body">
+            <div class="product-category">${escapeHTML(p.category || 'ARMATURE GOODS')}</div>
+            <h3 class="product-title" data-view-product="${escapeHTML(p.id)}">${escapeHTML(p.title || '未命名商品')}</h3>
+            <p class="product-desc">${escapeHTML(p.description || '尚未提供商品描述。')}</p>
+            <div class="product-bottom"><div class="price">${money(p.price)} <small>TWD</small></div><button class="btn btn-primary add-btn" data-add-cart="${escapeHTML(p.id)}" ${Number(p.stock || 0) <= 0 ? 'disabled' : ''}>＋ 加入裝備</button></div>
+          </div>
+        </article>`).join('');
+    }
+
+    function renderAdminProducts() {
+      const list = $('#adminProductList');
+      if (!products.length) { list.innerHTML = '<div class="muted small">尚無商品，請使用左側表單建立商品。</div>'; return; }
+      list.innerHTML = products.map(p => `
+        <div class="admin-row"><img src="${escapeHTML(p.mainImage || placeholderImage(p.title))}" alt="" onerror="this.onerror=null;this.src='${placeholderImage('UNIT')}';" />
+          <div class="admin-row-main"><strong>${escapeHTML(p.title || '未命名商品')}</strong><span>${money(p.price)} ・ 庫存 ${Number(p.stock || 0)} ・ ${p.isPublished ? '已上架' : '未上架'}</span></div>
+          <div class="admin-row-actions"><button class="btn" data-edit-product="${escapeHTML(p.id)}">編輯</button><button class="btn btn-danger" data-delete-product="${escapeHTML(p.id)}">刪除</button></div>
+        </div>`).join('');
+    }
+
+    function showProductDetail(productId) {
+      const p = getProduct(productId);
+      if (!p) return notify('商品資料已更新，請重新整理目錄。', 'error');
+      activeDetailProduct = p;
+      activeDetailImages = [p.mainImage || placeholderImage(p.title), ...(Array.isArray(p.gallery) ? p.gallery : [])].filter(Boolean);
+      $('#productDetailContent').innerHTML = `
+        <div class="product-detail">
+          <div><div class="detail-main-image"><img id="detailMainImage" src="${escapeHTML(activeDetailImages[0])}" alt="${escapeHTML(p.title)}" /></div><div class="thumbs" id="detailThumbs">${activeDetailImages.map((image, index) => `<button class="thumb ${index === 0 ? 'active' : ''}" data-detail-image="${index}" aria-label="查看第 ${index + 1} 張圖片"><img src="${escapeHTML(image)}" alt="商品細節圖 ${index + 1}" /></button>`).join('')}</div></div>
+          <div class="detail-info"><div class="eyebrow">${escapeHTML(p.sku || 'ARMATURE UNIT')}</div><div class="product-category" style="margin-top:10px">${escapeHTML(p.category || 'FIELD GEAR')}</div><h3>${escapeHTML(p.title || '未命名商品')}</h3><div class="detail-price">${money(p.price)} <span style="font:500 .75rem 'Noto Sans TC';color:var(--muted)">TWD</span></div><div class="detail-meta"><span>庫存狀態</span><strong style="color:${Number(p.stock || 0) > 0 ? 'var(--green)' : 'var(--red)'}">${Number(p.stock || 0) > 0 ? `可供應（${Number(p.stock)}）` : '暫無庫存'}</strong></div><div class="detail-description">${escapeHTML(p.description || '尚未提供商品描述。')}</div><div class="form-actions"><button class="btn btn-primary" data-detail-add-cart="${escapeHTML(p.id)}" ${Number(p.stock || 0) <= 0 ? 'disabled' : ''}>＋ 加入購物車</button>${isAdmin ? `<button class="btn" data-detail-edit="${escapeHTML(p.id)}">編輯商品</button>` : ''}</div></div>
+        </div>`;
+      openDialog('productDialog');
+    }
+
+    function addToCart(productId) {
+      const p = getProduct(productId);
+      if (!p || !p.isPublished && !isAdmin) return notify('此商品目前無法購買。', 'error');
+      if (Number(p.stock || 0) <= 0) return notify('此商品目前無庫存。', 'error');
+      const found = cart.find(item => item.productId === productId);
+      if (found) {
+        if (found.qty >= Number(p.stock || 0)) return notify('購物車數量已達目前庫存。', 'error');
+        found.qty += 1;
+      } else cart.push({ productId, qty: 1 });
+      saveCart(); renderCart(); notify(`已將「${p.title}」加入購物車。`);
+    }
+
+    function cartLineItems() {
+      return cart.map(item => ({ item, product: getProduct(item.productId) })).filter(row => row.product && (row.product.isPublished || isAdmin));
+    }
+    function renderCart() {
+      updateCartCount();
+      const rows = cartLineItems();
+      if (rows.length !== cart.length) {
+        cart = rows.map(({ item }) => item);
+        saveCart();
+      }
+      if (!rows.length) {
+        $('#cartItems').innerHTML = '<div class="empty-state"><span class="eyebrow">LOADOUT EMPTY</span><strong>你的購物車目前是空的</strong><span>前往裝備目錄，挑選喜歡的商品。</span></div>';
+        $('#cartSubtotal').textContent = money(0); $('#cartShipping').textContent = money(0); $('#cartTotal').textContent = money(0);
+        $('#placeOrderButton').disabled = true;
+        return;
+      }
+      $('#placeOrderButton').disabled = false;
+      $('#cartItems').innerHTML = rows.map(({ item, product }) => `
+        <div class="cart-row"><img src="${escapeHTML(product.mainImage || placeholderImage(product.title))}" alt="${escapeHTML(product.title)}" onerror="this.onerror=null;this.src='${placeholderImage('UNIT')}';"/><div><strong>${escapeHTML(product.title)}</strong><span>${money(product.price)} / 件</span><div class="qty-control"><button type="button" data-cart-decrease="${escapeHTML(product.id)}" aria-label="減少數量">−</button><span>${item.qty}</span><button type="button" data-cart-increase="${escapeHTML(product.id)}" aria-label="增加數量" ${item.qty >= Number(product.stock || 0) ? 'disabled' : ''}>＋</button><button type="button" data-cart-remove="${escapeHTML(product.id)}" style="width:auto;padding:0 7px;color:#ff9aa3">移除</button></div></div><strong class="cart-price">${money(Number(product.price || 0) * item.qty)}</strong></div>`).join('');
+      const subtotal = rows.reduce((sum, { item, product }) => sum + Number(product.price || 0) * item.qty, 0);
+      const shipping = subtotal === 0 || subtotal >= 1500 ? 0 : 80;
+      $('#cartSubtotal').textContent = money(subtotal); $('#cartShipping').textContent = money(shipping); $('#cartTotal').textContent = money(subtotal + shipping);
+      const name = currentProfile.displayName || currentUser?.displayName || '';
+      $('#checkoutName').value = $('#checkoutName').value || name;
+      $('#checkoutPhone').value = $('#checkoutPhone').value || currentProfile.phone || '';
+      $('#checkoutAddress').value = $('#checkoutAddress').value || currentProfile.address || '';
+    }
+
+    async function openCart() {
+      renderCart();
+      if (!currentUser) {
+        // Allow visitors to inspect their cart, but ask them to sign in before checkout.
+      }
+      openDialog('cartDialog');
+    }
+
+    async function placeOrder(event) {
+      event.preventDefault();
+      if (!currentUser) { closeDialog('cartDialog'); setAuthMode('login'); openDialog('authDialog'); return notify('請先登入會員，再送出訂單。', 'error'); }
+      if (!$('#checkoutForm').reportValidity()) return;
+      const rows = cartLineItems();
+      if (!rows.length) return notify('購物車沒有可結帳的商品。', 'error');
+      const button = $('#placeOrderButton');
+      button.disabled = true; button.textContent = '正在建立訂單…';
+      try {
+        // Refresh products from Firestore and calculate from latest stored prices in this browser.
+        // For live payments, this calculation MUST be repeated on a trusted server.
+        const freshRows = [];
+        for (const { item } of rows) {
+          const snap = await getDoc(doc(db, 'products', item.productId));
+          if (!snap.exists()) throw new Error('購物車中有商品已不存在，請重新整理。');
+          const product = { id: snap.id, ...snap.data() };
+          if (!product.isPublished || Number(product.stock || 0) < item.qty) throw new Error(`「${product.title}」庫存不足或已下架。`);
+          freshRows.push({ item, product });
+        }
+        const subtotal = freshRows.reduce((sum, { item, product }) => sum + Number(product.price || 0) * item.qty, 0);
+        const shipping = subtotal >= 1500 ? 0 : 80;
+        const orderNo = `ARM-${Date.now().toString(36).toUpperCase()}`;
+        const customer = {
+          name: $('#checkoutName').value.trim(),
+          phone: $('#checkoutPhone').value.trim(),
+          address: $('#checkoutAddress').value.trim(),
+          email: currentUser.email || ''
+        };
+        const items = freshRows.map(({ item, product }) => ({
+          productId: product.id, title: product.title || '商品', price: Number(product.price || 0), quantity: item.qty,
+          image: product.mainImage || ''
+        }));
+        await addDoc(collection(db, 'orders'), {
+          userId: currentUser.uid, orderNo, customer, items,
+          subtotal, shipping, total: subtotal + shipping,
+          paymentMethod: 'unintegrated_test', status: 'pending_payment', createdAt: serverTimestamp()
+        });
+        cart = []; saveCart(); renderCart(); closeDialog('cartDialog');
+        notify(`測試訂單 ${orderNo} 已建立。尚未付款，也不會扣款。`);
+        if (currentUser) await loadMemberOrders();
+        if (isAdmin) await loadAdminOrders();
+      } catch (error) {
+        console.error(error);
+        notify(explainError(error), 'error');
+      } finally {
+        button.disabled = false; button.textContent = '送出測試訂單（不扣款）';
+      }
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      $$('.tab-btn').forEach(button => button.classList.toggle('active', button.dataset.authMode === mode));
+      $('#signupNameRow').classList.toggle('hidden', mode !== 'signup');
+      $('#signupName').required = mode === 'signup';
+      $('#authSubmit').textContent = mode === 'signup' ? '建立帳號' : '登入';
+      $('#authHint').textContent = mode === 'signup' ? '建立會員後，系統會在 Firestore 建立你的會員資料。' : '使用已註冊的電子郵件與密碼登入。';
+      $('#authPassword').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+    }
+
+    async function handleAuth(event) {
+      event.preventDefault();
+      const email = $('#authEmail').value.trim();
+      const password = $('#authPassword').value;
+      const button = $('#authSubmit');
+      button.disabled = true; button.textContent = authMode === 'signup' ? '建立中…' : '登入中…';
+      try {
+        if (authMode === 'signup') {
+          const displayName = $('#signupName').value.trim();
+          const credential = await createUserWithEmailAndPassword(auth, email, password);
+          if (displayName) await updateProfile(credential.user, { displayName });
+          await setDoc(doc(db, 'users', credential.user.uid), {
+            displayName, email, phone: '', address: '', createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+          });
+          notify('會員帳號建立成功。');
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+          notify('登入成功，歡迎回到整備基地。');
+        }
+        closeDialog('authDialog'); $('#authForm').reset();
+      } catch (error) {
+        console.error(error); notify(explainError(error), 'error');
+      } finally {
+        button.disabled = false; button.textContent = authMode === 'signup' ? '建立帳號' : '登入';
+      }
+    }
+
+    async function handlePasswordReset() {
+      const email = $('#authEmail').value.trim();
+      if (!email) return notify('請先填入電子郵件，再寄送重設密碼信。', 'error');
+      try { await sendPasswordResetEmail(auth, email); notify('已寄出重設密碼信，請查看電子郵件。'); }
+      catch (error) { notify(explainError(error), 'error'); }
+    }
+
+    async function loadProfile() {
+      if (!currentUser) return;
+      const userRef = doc(db, 'users', currentUser.uid);
+      const snap = await getDoc(userRef);
+      if (snap.exists()) currentProfile = snap.data();
+      else {
+        currentProfile = { displayName: currentUser.displayName || '', email: currentUser.email || '', phone: '', address: '' };
+        await setDoc(userRef, { ...currentProfile, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      }
+      fillProfileForm();
+    }
+    function fillProfileForm() {
+      $('#profileEmail').value = currentUser?.email || '';
+      $('#profileName').value = currentProfile.displayName || currentUser?.displayName || '';
+      $('#profilePhone').value = currentProfile.phone || '';
+      $('#profileAddress').value = currentProfile.address || '';
+    }
+    async function saveProfile(event) {
+      event.preventDefault();
+      if (!currentUser) return;
+      const displayName = $('#profileName').value.trim();
+      const phone = $('#profilePhone').value.trim();
+      const address = $('#profileAddress').value.trim();
+      try {
+        await setDoc(doc(db, 'users', currentUser.uid), { displayName, phone, address, updatedAt: serverTimestamp() }, { merge: true });
+        await updateProfile(currentUser, { displayName });
+        currentProfile = { ...currentProfile, displayName, phone, address };
+        renderAccountButton(); renderCart(); notify('會員資料已儲存。');
+      } catch (error) { console.error(error); notify(explainError(error), 'error'); }
+    }
+    function renderAccountButton() {
+      $('#accountButton').textContent = currentUser ? (currentProfile.displayName || currentUser.email?.split('@')[0] || '會員中心') : '登入 / 註冊';
+      $('#adminPanel').classList.toggle('hidden', !isAdmin);
+      $('#adminNav').classList.toggle('hidden', !isAdmin);
+    }
+
+    async function loadMemberOrders() {
+      if (!currentUser) return;
+      const target = $('#memberOrderList');
+      target.textContent = '讀取訂單中…';
+      try {
+        const snapshot = await getDocs(query(collection(db, 'orders'), where('userId', '==', currentUser.uid)));
+        const orders = snapshot.docs.map(item => ({ id: item.id, ...item.data() })).sort((a, b) => timestampMs(b.createdAt) - timestampMs(a.createdAt));
+        target.innerHTML = orders.length ? orders.map(order => `<div class="order-row"><div><strong>${escapeHTML(order.orderNo || order.id)}</strong><div class="muted small">${dateText(order.createdAt)} ・ ${Array.isArray(order.items) ? order.items.length : 0} 項商品</div></div><div style="text-align:right"><strong>${money(order.total)}</strong><div><span class="status-chip">${escapeHTML(order.status || 'processing')}</span></div></div></div>`).join('') : '<div class="muted small">目前沒有訂單紀錄。</div>';
+      } catch (error) { console.error(error); target.innerHTML = `<div class="muted small">${escapeHTML(explainError(error))}</div>`; }
+    }
+    async function loadAdminOrders() {
+      if (!isAdmin) return;
+      const target = $('#adminOrderList');
+      try {
+        const snapshot = await getDocs(collection(db, 'orders'));
+        const orders = snapshot.docs.map(item => ({ id: item.id, ...item.data() })).sort((a, b) => timestampMs(b.createdAt) - timestampMs(a.createdAt)).slice(0, 30);
+        target.innerHTML = orders.length ? orders.map(order => `<div class="order-row"><div><strong>${escapeHTML(order.orderNo || order.id)}</strong><div class="muted small">會員 UID：${escapeHTML(order.userId || '')} ・ ${dateText(order.createdAt)} ・ ${escapeHTML(order.customer?.name || '')}</div></div><div style="text-align:right"><strong>${money(order.total)}</strong><div><span class="status-chip">${escapeHTML(order.status || 'processing')}</span></div></div></div>`).join('') : '<div class="muted small">尚無訂單資料。</div>';
+      } catch (error) { console.error(error); target.textContent = explainError(error); }
+    }
+
+    function resetProductForm() {
+      editingProduct = null;
+      $('#productForm').reset();
+      $('#editProductId').value = '';
+      $('#productPublished').checked = true;
+      $('#productFormTitle').textContent = '＋ 建立新商品 / NEW UNIT';
+      $('#saveProductButton').textContent = '儲存商品資料';
+      $('#cancelEditButton').classList.add('hidden');
+      $('#productMainImage').required = true;
+      $('#imagePreview').innerHTML = '';
+    }
+    function beginEditProduct(productId) {
+      const p = getProduct(productId);
+      if (!p) return;
+      editingProduct = p;
+      $('#editProductId').value = p.id;
+      $('#productName').value = p.title || '';
+      $('#productSku').value = p.sku || '';
+      $('#productCategory').value = p.category || '';
+      $('#productPrice').value = Number(p.price || 0);
+      $('#productStock').value = Number(p.stock || 0);
+      $('#productDescription').value = p.description || '';
+      $('#productPublished').checked = p.isPublished === true;
+      $('#productMainImage').value = '';
+      $('#productGallery').value = '';
+      $('#productMainImage').required = false;
+      $('#imagePreview').innerHTML = [p.mainImage, ...(Array.isArray(p.gallery) ? p.gallery : [])].filter(Boolean).slice(0, 8).map(url => `<img src="${escapeHTML(url)}" alt="既有商品圖片" />`).join('');
+      $('#productFormTitle').textContent = `✎ 編輯商品 / ${p.sku || p.title}`;
+      $('#saveProductButton').textContent = '更新商品資料';
+      $('#cancelEditButton').classList.remove('hidden');
+      $('#adminPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function uploadProductImage(file) {
+      if (!file || !file.type.startsWith('image/')) throw new Error('請只選擇圖片檔案。');
+      if (file.size >= 8 * 1024 * 1024) throw new Error(`圖片「${file.name}」超過 8 MB。`);
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-90);
+      const path = `products/${currentUser.uid}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+      const fileRef = storageRef(storage, path);
+      await uploadBytes(fileRef, file, { contentType: file.type });
+      return getDownloadURL(fileRef);
+    }
+
+    async function saveProduct(event) {
+      event.preventDefault();
+      if (!isAdmin || !currentUser) return notify('此功能僅限管理員使用。', 'error');
+      if (!$('#productForm').reportValidity()) return;
+      const mainFile = $('#productMainImage').files[0];
+      const galleryFiles = [...$('#productGallery').files];
+      if (!editingProduct && !mainFile) return notify('建立新商品時請上傳商品主圖。', 'error');
+      const button = $('#saveProductButton');
+      button.disabled = true; button.textContent = '圖片上傳／儲存中…';
+      try {
+        let mainImage = editingProduct?.mainImage || '';
+        if (mainFile) mainImage = await uploadProductImage(mainFile);
+        const gallery = galleryFiles.length ? await Promise.all(galleryFiles.map(uploadProductImage)) : (editingProduct?.gallery || []);
+        const payload = {
+          title: $('#productName').value.trim(), sku: $('#productSku').value.trim(),
+          category: $('#productCategory').value.trim(), price: Number($('#productPrice').value),
+          stock: Number($('#productStock').value), description: $('#productDescription').value.trim(),
+          mainImage, gallery, isPublished: $('#productPublished').checked, updatedAt: serverTimestamp()
+        };
+        if (!payload.title || !payload.category || !payload.description || !mainImage) throw new Error('請完整填寫商品資料並設定主圖。');
+        if (editingProduct) {
+          await updateDoc(doc(db, 'products', editingProduct.id), payload);
+          notify('商品資料已更新。');
+        } else {
+          await addDoc(collection(db, 'products'), { ...payload, createdAt: serverTimestamp() });
+          notify('新商品已建立。');
+        }
+        resetProductForm(); await loadProducts();
+      } catch (error) { console.error(error); notify(explainError(error), 'error'); }
+      finally { button.disabled = false; button.textContent = editingProduct ? '更新商品資料' : '儲存商品資料'; }
+    }
+
+    async function removeProduct(productId) {
+      const p = getProduct(productId);
+      if (!p || !isAdmin) return;
+      if (!confirm(`確定刪除商品「${p.title}」？此動作無法復原。已上傳至 Storage 的圖片檔案不會自動刪除。`)) return;
+      try {
+        await deleteDoc(doc(db, 'products', productId));
+        cart = cart.filter(item => item.productId !== productId); saveCart();
+        if (editingProduct?.id === productId) resetProductForm();
+        await loadProducts(); notify('商品資料已刪除。');
+      } catch (error) { console.error(error); notify(explainError(error), 'error'); }
+    }
+
+    // Global event handlers
+    $('#authForm').addEventListener('submit', handleAuth);
+    $('#resetPasswordButton').addEventListener('click', handlePasswordReset);
+    $('#profileForm').addEventListener('submit', saveProfile);
+    $('#productForm').addEventListener('submit', saveProduct);
+    $('#checkoutForm').addEventListener('submit', placeOrder);
+    $('#searchInput').addEventListener('input', renderProducts);
+    $('#categoryFilter').addEventListener('change', renderProducts);
+    $('#sortFilter').addEventListener('change', renderProducts);
+    $('#accountButton').addEventListener('click', async () => {
+      if (!currentUser) { setAuthMode('login'); openDialog('authDialog'); return; }
+      fillProfileForm(); await loadMemberOrders(); openDialog('memberDialog');
+    });
+    $('#heroAccountButton').addEventListener('click', () => {
+      if (!currentUser) { setAuthMode('signup'); openDialog('authDialog'); }
+      else { fillProfileForm(); loadMemberOrders(); openDialog('memberDialog'); }
+    });
+    $('#cartButton').addEventListener('click', openCart);
+    $('#signOutButton').addEventListener('click', async () => {
+      try { await signOut(auth); closeDialog('memberDialog'); notify('已安全登出。'); }
+      catch (error) { notify(explainError(error), 'error'); }
+    });
+    $$('.tab-btn').forEach(button => button.addEventListener('click', () => setAuthMode(button.dataset.authMode)));
+    $$('[data-close]').forEach(button => button.addEventListener('click', () => closeDialog(button.dataset.close)));
+    $$('dialog').forEach(dialog => dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); }));
+    $('#productGrid').addEventListener('click', event => {
+      const addButton = event.target.closest('[data-add-cart]');
+      if (addButton) return addToCart(addButton.dataset.addCart);
+      const view = event.target.closest('[data-view-product]');
+      if (view) showProductDetail(view.dataset.viewProduct);
+    });
+    $('#productGrid').addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-view-product]')) { event.preventDefault(); showProductDetail(event.target.dataset.viewProduct); } });
+    $('#productDetailContent').addEventListener('click', event => {
+      const thumb = event.target.closest('[data-detail-image]');
+      if (thumb) {
+        const index = Number(thumb.dataset.detailImage);
+        $('#detailMainImage').src = activeDetailImages[index];
+        $$('.thumb', $('#detailThumbs')).forEach((item, i) => item.classList.toggle('active', i === index));
+      }
+      const add = event.target.closest('[data-detail-add-cart]');
+      if (add) addToCart(add.dataset.detailAddCart);
+      const edit = event.target.closest('[data-detail-edit]');
+      if (edit) { closeDialog('productDialog'); beginEditProduct(edit.dataset.detailEdit); }
+    });
+    $('#cartItems').addEventListener('click', event => {
+      const decrease = event.target.closest('[data-cart-decrease]');
+      const increase = event.target.closest('[data-cart-increase]');
+      const remove = event.target.closest('[data-cart-remove]');
+      if (decrease) { const item = cart.find(row => row.productId === decrease.dataset.cartDecrease); if (item) item.qty -= 1; cart = cart.filter(row => row.qty > 0); }
+      if (increase) { const item = cart.find(row => row.productId === increase.dataset.cartIncrease); const product = getProduct(increase.dataset.cartIncrease); if (item && product && item.qty < Number(product.stock || 0)) item.qty += 1; }
+      if (remove) cart = cart.filter(row => row.productId !== remove.dataset.cartRemove);
+      saveCart(); renderCart();
+    });
+    $('#adminProductList').addEventListener('click', event => {
+      const edit = event.target.closest('[data-edit-product]');
+      const remove = event.target.closest('[data-delete-product]');
+      if (edit) beginEditProduct(edit.dataset.editProduct);
+      if (remove) removeProduct(remove.dataset.deleteProduct);
+    });
+    $('#cancelEditButton').addEventListener('click', resetProductForm);
+    $('#resetProductButton').addEventListener('click', () => setTimeout(resetProductForm, 0));
+    $('#productMainImage').addEventListener('change', previewSelectedImages);
+    $('#productGallery').addEventListener('change', previewSelectedImages);
+    function previewSelectedImages() {
+      const previews = [];
+      const main = $('#productMainImage').files[0];
+      const gallery = [...$('#productGallery').files].slice(0, 8);
+      for (const file of [main, ...gallery].filter(Boolean)) previews.push(URL.createObjectURL(file));
+      $('#imagePreview').innerHTML = previews.map(url => `<img src="${url}" alt="待上傳圖片預覽" />`).join('');
+    }
+
+    $('#yearNow').textContent = new Date().getFullYear();
+    updateCartCount();
+    setAuthMode('login');
+
+    onAuthStateChanged(auth, async user => {
+      currentUser = user;
+      currentProfile = {};
+      isAdmin = !!user && ADMIN_UIDS.includes(user.uid);
+      renderAccountButton();
+      try { if (user) await loadProfile(); }
+      catch (error) { console.error(error); notify(`會員資料讀取失敗：${explainError(error)}`, 'error'); }
+      await loadProducts();
+      if (isAdmin) await loadAdminOrders();
+      renderCart();
+    });
+  </script>
+</body>
+</html>
